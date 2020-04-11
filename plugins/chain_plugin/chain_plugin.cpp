@@ -1984,12 +1984,13 @@ void read_write::push_transaction_v2(const read_write::push_transaction_params& 
    try {
       auto pretty_input = std::make_shared<packed_transaction>();
       auto resolver = make_resolver(this, abi_serializer_max_time);
+      transaction_metadata_ptr ptrx;
       try {
          abi_serializer::from_variant(params, *pretty_input, resolver, abi_serializer_max_time);
+         ptrx = std::make_shared<transaction_metadata>( pretty_input );
       } EOS_RETHROW_EXCEPTIONS(chain::packed_transaction_type_exception, "Invalid packed transaction")
 
-      app().get_method<incoming::methods::transaction_async>()(pretty_input, true,
-                                                               [this, next](const fc::static_variant<fc::exception_ptr, transaction_trace_ptr>& result) -> void{
+      app().get_method<incoming::methods::transaction_async>()(ptrx, true, [next](const fc::static_variant<fc::exception_ptr, transaction_trace_ptr>& result) -> void{
                                                                   if (result.contains<fc::exception_ptr>()) {
                                                                      next(result.get<fc::exception_ptr>());
                                                                   } else {
