@@ -403,7 +403,12 @@ struct controller_impl {
             db.commit( (*bitr)->block_num );
             root_id = (*bitr)->id;
 
-            blog.append( (*bitr)->block );
+            /*blog.append( (*bitr)->block );*/
+            block_state bs = *(*bitr);
+            if ( bs.block_num % 64 == 0 ){
+               bs.block->block_extensions.emplace_back(std::make_pair(0xF,fc::raw::pack(bs.blockroot_merkle))); // used by ibc_plugin
+            }
+            blog.append(bs.block);
 
             auto rbitr = rbi.begin();
             while( rbitr != rbi.end() && rbitr->blocknum <= (*bitr)->block_num ) {
@@ -2209,6 +2214,10 @@ struct controller_impl {
    }
 
 }; /// controller_impl
+
+void controller::drop_all_unapplied_transactions() {
+   my->unapplied_transactions.clear();
+}
 
 const resource_limits_manager&   controller::get_resource_limits_manager()const
 {

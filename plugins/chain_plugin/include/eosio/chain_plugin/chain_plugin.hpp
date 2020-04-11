@@ -594,7 +594,7 @@ public:
       fc::variant                 processed;
    };
    void push_transaction(const push_transaction_params& params, chain::plugin_interface::next_function<push_transaction_results> next);
-
+   void push_transaction_v2(const push_transaction_params& params, chain::plugin_interface::next_function<push_transaction_results> next);
 
    using push_transactions_params  = vector<push_transaction_params>;
    using push_transactions_results = vector<push_transaction_results>;
